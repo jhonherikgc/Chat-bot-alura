@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InteliBot</title>
+
+  <!-- Highlight.js para formatação de código -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+
+  <!-- Fontes e estilos personalizados -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+  <div class="chat-wrapper">
+    <h1 class="chat-title">🤖Bem-vindo (a) ao InteliBot <span id="auto-type"></span>🤖</h1>
+
+    <div class="chat-history" id="historico">
+      <!-- Mensagens serão adicionadas aqui -->
+    </div>
+
+    <div class="chat-input-area">
+      <textarea id="pergunta" name="pergunta" placeholder="Digite sua pergunta ao InteliBot..."></textarea>
+      <select id="modelo" name="modelo">
+        <option value="gemini-1.5-flash">Flash 1.5</option>
+        <option value="gemini-2.0-flash">Flash 2.0</option>
+      </select>
+      <button id="enviar">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Script JS -->
+  <script>
+    const historicoDiv = document.getElementById('historico');
+    const perguntaInput = document.getElementById('pergunta');
+    const modeloSelect = document.getElementById('modelo');
+    const enviarButton = document.getElementById('enviar');
+
+    function formatarResposta(texto) {
+      texto = texto.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+        return `<pre><code class="language-${lang || 'plaintext'}">${hljs.highlightAuto(code).value}</code></pre>`;
+      });
+      texto = texto.replace(/`([^`\n]+)`/g, (match, inline) => `<code>${inline}</code>`);
+      return texto;
+    }
+
+    function adicionarMensagem(mensagem) {
+      const div = document.createElement('div');
+      div.classList.add('mensagem');
+      if (mensagem.remetente === 'user') {
+        div.classList.add('mensagem-usuario');
+        div.textContent = `Você: ${mensagem.texto}`;
+      } else {
+        div.classList.add('mensagem-bot');
+        div.innerHTML = `<strong>Resposta:</strong> ${formatarResposta(mensagem.texto)}`;
+      }
+      historicoDiv.appendChild(div);
+      historicoDiv.scrollTop = historicoDiv.scrollHeight;
+    }
+
+    enviarButton.addEventListener('click', () => {
+      const pergunta = perguntaInput.value.trim();
+      const modelo = modeloSelect.value;
+      if (!pergunta) return;
+
+      adicionarMensagem({ remetente: 'user', texto: pergunta });
+      perguntaInput.value = '';
+      enviarButton.disabled = true;
+
+      const formData = new FormData();
+      formData.append('pergunta', pergunta);
+      formData.append('modelo', modelo);
+
+      fetch('/gerar_resposta', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          enviarButton.disabled = false;
+          adicionarMensagem({ remetente: 'gemini', texto: data.resposta || 'Sem resposta.' });
+        })
+        .catch(error => {
+          enviarButton.disabled = false;
+          adicionarMensagem({ remetente: 'gemini', texto: `Erro: ${error}` });
+        });
+    });
+  </script>
+  <!-- Typing Js inline -->
+  <script>
+      const textos = [
+    "A inteligência artificial ao seu alcance.",
+    "As soluções inteligentes para as suas dúvidas.",
+    "Onde Conecta você ao conhecimento."
+  ];
+
+  let i = 0;      
+  let j = 0;      
+  let apagando = false;
+  const elemento = document.getElementById("auto-type");
+
+  function loop() {
+    const frase = textos[i];
+
+    if (!apagando) {
+      elemento.textContent = frase.substring(0, j + 1);
+      j++;
+      if (j === frase.length) {
+        apagando = true;
+        setTimeout(loop, 1500); 
+        return;
+      }
+    } else {
+      elemento.textContent = frase.substring(0, j - 1);
+      j--;
+      if (j === 0) {
+        apagando = false;
+        i = (i + 1) % textos.length;
+      }
+    }
+
+    setTimeout(loop, apagando ? 50 : 100);
+  }
+
+  loop();
+  </script>
+
+</body>
+</html>
