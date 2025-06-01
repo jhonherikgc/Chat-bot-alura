@@ -45,8 +45,9 @@ cd intelibot
 # 2. Crie um ambiente virtual
 python -m venv venv
 # Para Linux
-source venv/bin/activate  # ou 
-venv\Scripts\activate no Windows
+source venv/bin/activate 
+# Para Windows 
+venv\Scripts\activate
 
 # 3. Instale as dependências
 pip install -r requirements.txt
