@@ -39,7 +39,7 @@
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seuusuario/intelibot.git
+git clone https://github.com/jhonherikgc/intelibot.git
 cd intelibot
 
 # 2. Crie um ambiente virtual
