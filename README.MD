@@ -32,7 +32,7 @@
 ### Pré-requisitos:
 
 - Python 3.10+
-- Conta na [Google Generative AI](https://makersuite.google.com/app) com chave de API
+- Para pegar sua chave API - Conta na [Google Generative AI](https://makersuite.google.com/app) com chave de API
 - Node opcionalmente (para custom builds de CSS, se desejar)
 
 ### Passos:
@@ -44,7 +44,9 @@ cd intelibot
 
 # 2. Crie um ambiente virtual
 python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
+# Para Linux
+source venv/bin/activate  # ou 
+venv\Scripts\activate no Windows
 
 # 3. Instale as dependências
 pip install -r requirements.txt
