@@ -57,6 +57,11 @@ echo "GOOGLE_API_KEY=sua-chave-aqui" > .env
 
 # 5. Execute o app
 python app.py
+
+
+# 6. Caso não funcione tente instalar manualmente
+pip install Flask python-dotenv google-generativeai
+pip install flask flask-session python-dotenv
 ```
 ### 🙏 Agradecimentos
 Este projeto foi desenvolvido com base no aprendizado da Imersão Inteligência Artificial 2025 da Alura.
