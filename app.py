@@ -3,16 +3,22 @@ from flask_session import Session
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-import warnings
+import logging
 
-warnings.filterwarnings("ignore")
+# Configura o sistema de logging para exibir mensagens de DEBUG e INFO
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Carrega variáveis de ambiente
 load_dotenv()
 
 # Configura chave da API
 google_api_key = os.getenv('GOOGLE_API_KEY')
-genai.configure(api_key=google_api_key)
+if not google_api_key:
+    logging.error("GOOGLE_API_KEY não encontrada nas variáveis de ambiente. Por favor, verifique seu arquivo .env")
+    # Você pode optar por levantar uma exceção aqui ou lidar com isso de outra forma
+else:
+    genai.configure(api_key=google_api_key)
+    logging.info("Google Generative AI configurado com sucesso.")
 
 # Inicializa o Flask
 app = Flask(__name__)
@@ -20,29 +26,62 @@ app.secret_key = 'sua-chave-secreta'  # Use uma chave forte em produção
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
+# Removendo o filtro de warnings temporariamente para depuração
+# warnings.filterwarnings("ignore") # Descomente se quiser ignorar warnings após a depuração
+
 # Rota principal
 @app.route('/')
 def index():
+    logging.info("Página inicial acessada.")
     return render_template('index.html')
-
+                                                
 # Gera a resposta do modelo com memória
-@app.route('/gerar_resposta', methods=['POST'])
+@app.route('/gerar_resposta', methods=['POST'])         
 def gerar_resposta():
     pergunta = request.form['pergunta']
-    modelo_selecionado = request.form['modelo']
+    modelo_selecionado = request.form['modelo'] 
+    logging.debug(f"Recebida pergunta: '{pergunta}' para o modelo: '{modelo_selecionado}'")
 
     # Recupera ou inicia o histórico
     historico = session.get('historico', [])
+    logging.debug(f"Histórico atual da sessão: {historico}")
 
     # Adiciona a pergunta do usuário
     historico.append({'role': 'user', 'parts': [pergunta]})
 
     try:
         model = genai.GenerativeModel(modelo_selecionado)
+        logging.debug(f"Modelo Generative AI instanciado: {modelo_selecionado}")
+        
+        # Configurações de geração e segurança
+        generation_config = {
+            "candidate_count": 1,
+            "temperature": 0.7,
+        }
+        safety_settings = {
+            'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
+            'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
+            'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
+            'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE',
+        }
 
         # Gera resposta com o histórico completo
-        resposta = model.generate_content(contents=historico)
-        texto_resposta = resposta.text if resposta and resposta.text else "Sem resposta do modelo."
+        logging.debug("Chamando model.generate_content...")
+        resposta = model.generate_content(contents=historico, generation_config=generation_config, safety_settings=safety_settings)
+        logging.debug(f"Resposta bruta da API: {resposta}")
+        
+        texto_resposta = "Não foi possível extrair uma resposta do modelo. A resposta pode estar vazia ou bloqueada." # Mensagem padrão
+        try:
+            # Acessa o texto da primeira parte da primeira candidata
+            if resposta and resposta.candidates and len(resposta.candidates) > 0 and \
+               resposta.candidates[0].content and resposta.candidates[0].content.parts and \
+               len(resposta.candidates[0].content.parts) > 0:
+                texto_resposta = resposta.candidates[0].content.parts[0].text
+                logging.info(f"Texto da resposta extraído com sucesso: {texto_resposta[:100]}...") # Log dos primeiros 100 caracteres
+            else:
+                logging.warning(f"Resposta da API não contém texto extraível ou está vazia. Resposta completa: {resposta}")
+        except (IndexError, AttributeError) as e:
+            logging.error(f"Erro ao tentar extrair texto da resposta: {e}", exc_info=True)
 
         # Adiciona a resposta do modelo
         historico.append({'role': 'model', 'parts': [texto_resposta]})
@@ -51,7 +90,8 @@ def gerar_resposta():
         return jsonify({'resposta': texto_resposta, 'model': modelo_selecionado})
 
     except Exception as e:
-        return jsonify({'erro': f"Ocorreu um erro ao gerar a resposta: {e}"})
+        logging.error(f"Ocorreu um erro inesperado ao gerar a resposta: {e}", exc_info=True)
+        return jsonify({'erro': f"Ocorreu um erro no servidor ao gerar a resposta: {e}"})
 
 # Opcional: rota para limpar o histórico da sessão
 @app.route('/limpar_historico')
