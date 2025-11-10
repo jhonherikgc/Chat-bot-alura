@@ -3,8 +3,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(to right, #343541, #2563eb);
-  color: white;
+  /* Fundo principal: Preto Profundo */
+  background: #121212; 
+  color: #E0E0E0; /* Texto principal: Branco Suave */
 }
 
 /* Container do chat */
@@ -12,9 +13,10 @@ body {
   max-width: 960px;
   height: 85vh;
   margin: 2rem auto;
-  background-color: #444654;
+  /* Container: Cinza Carvão */
+  background-color: #1E1E1E; 
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); /* Sombra mais forte para destacar */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -27,9 +29,11 @@ body {
   text-align: center;
   font-size: 1.5rem;
   font-weight: 600;
-  padding: 1rem;
-  text-align: left; /* Alinha o texto à esquerda */
-  border-bottom: 1px solid #3d3d3f;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  /* Linha divisória: Cinza Escuro Sutil */
+  border-bottom: 1px solid #333333; 
+  color: #E0E0E0;
 }
 
 /* Histórico */
@@ -39,81 +43,122 @@ body {
   padding: 1rem 1.5rem;
 }
 
-/* Mensagens */
-.mensagem {
-  margin-bottom: 12px;
-  padding: 0.75rem;
-  border-radius: 10px;
-  white-space: pre-wrap;
+/* Scrollbar (Estilização para dark mode) */
+.chat-history::-webkit-scrollbar {
+    width: 8px;
+}
+.chat-history::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 10px;
+}
+.chat-history::-webkit-scrollbar-track {
+    background: #1E1E1E;
 }
 
-span {
-  color: #0051ff;
+/* Mensagens */
+.mensagem {
+  margin-bottom: 15px;
+  padding: 1rem;
+  border-radius: 10px;
+  max-width: 85%;
+  line-height: 1.6;
+}
+
+/* Destaque para o texto auto-type */
+#auto-type {
+  color: #007BFF; /* Azul Sólido Corporativo */
 }
 
 .mensagem-usuario {
-  background-color: #343541;
-  color: white;
+  /* Fundo da Mensagem do Usuário: Azul Escuro (Ação) */
+  background-color: #0056B3; 
+  color: #FFFFFF;
   align-self: flex-end;
+  margin-left: auto;
 }
 
 .mensagem-bot {
-  background-color: #3f3f46;
-  color: #f1f5f9;
+  /* Fundo da Mensagem do Bot: Cinza Escuro (Conteúdo) */
+  background-color: #2C2C2C; 
+  color: #E0E0E0;
   align-self: flex-start;
+  margin-right: auto;
+  border: 1px solid #333333;
 }
 
 /* Área de entrada */
 .chat-input-area {
   display: flex;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-top: 1px solid #3d3d3f;
-  background-color: #40414f;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  /* Fundo da área de input */
+  border-top: 1px solid #333333; 
+  background-color: #1E1E1E; 
 }
 
 .chat-input-area textarea {
   flex-grow: 1;
   padding: 0.75rem;
   border-radius: 8px;
-  background-color: #343541;
-  color: white;
-  border: 1px solid #4b5563;
+  /* Input: Fundo mais escuro que o container */
+  background-color: #2C2C2C; 
+  color: #E0E0E0;
+  border: 1px solid #444444;
   resize: none;
+  transition: border-color 0.3s;
+}
+
+.chat-input-area textarea:focus {
+  border-color: #007BFF; /* Foco: Azul Corporativo */
+  outline: none;
 }
 
 .chat-input-area select {
   padding: 0.5rem;
   border-radius: 8px;
-  background-color: #343541;
-  color: white;
-  border: 1px solid #4b5563;
+  /* Select: Fundo mais escuro que o container */
+  background-color: #2C2C2C; 
+  color: #E0E0E0;
+  border: 1px solid #444444;
 }
 
 .chat-input-area button {
-  background: linear-gradient(to right, #343541, #3b82f6);
+  /* Botão: Azul Sólido Corporativo */
+  background-color: #007BFF; 
   border: none;
   color: white;
   font-weight: bold;
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .chat-input-area button:hover {
-  background: linear-gradient(to right, #343541, #2563eb);
+  background-color: #0056B3; /* Azul um pouco mais escuro no hover */
 }
 
 /* Estilização para código */
 pre {
-  background-color: #1e1e1e;
+  /* Fundo preto padrão para blocos de código */
+  background-color: #111111; 
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow-x: auto;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #333333;
 }
 
 code {
   font-family: 'Courier New', monospace;
   color: #d4d4d4;
+}
+
+/* Destaque para código inline */
+.mensagem-bot code {
+  background-color: #444444; /* Fundo escuro para código inline */
+  color: #E0E0E0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
 }
