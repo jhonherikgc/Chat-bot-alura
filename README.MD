@@ -2,6 +2,8 @@
 
 **InteliBot** é um assistente virtual inteligente construído com **Flask** e integrado aos modelos **Gemini (Google Generative AI)**. Ele permite ao usuário conversar com a IA, receber respostas com código formatado, e ainda simula uma animação de digitação para uma experiência mais fluida e realista.
 
+<img src="./static/img/Screenshot From 2025-11-10 16-31-03.png" alt="projeto_foto"></img>
+
 ---
 
 ## 🚀 Tecnologias Utilizadas
@@ -45,8 +47,8 @@ cd intelibot
 # 2. Crie um ambiente virtual
 python -m venv venv
 # Para Linux
-source venv/bin/activate 
-# Para Windows 
+source venv/bin/activate
+# Para Windows
 venv\Scripts\activate
 
 # 3. Instale as dependências
@@ -63,7 +65,9 @@ python app.py
 pip install Flask python-dotenv google-generativeai
 pip install flask flask-session python-dotenv
 ```
+
 ### 🙏 Agradecimentos
+
 Este projeto foi desenvolvido com base no aprendizado da Imersão Inteligência Artificial 2025 da Alura.
 A imersão me guiou passo a passo na criação do projeto, na integração com IA generativa e construção do frontend moderno.
 
