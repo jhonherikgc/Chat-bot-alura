@@ -50,24 +50,13 @@ def gerar_resposta():
     historico.append({'role': 'user', 'parts': [pergunta]})
 
     try:
+        model = genai.GenerativeModel('gemini-1.0-pro')
         model = genai.GenerativeModel(modelo_selecionado)
         logging.debug(f"Modelo Generative AI instanciado: {modelo_selecionado}")
-        
-        # Configurações de geração e segurança
-        generation_config = {
-            "candidate_count": 1,
-            "temperature": 0.7,
-        }
-        safety_settings = {
-            'HARM_CATEGORY_HARASSMENT': 'BLOCK_NONE',
-            'HARM_CATEGORY_HATE_SPEECH': 'BLOCK_NONE',
-            'HARM_CATEGORY_SEXUALLY_EXPLICIT': 'BLOCK_NONE',
-            'HARM_CATEGORY_DANGEROUS_CONTENT': 'BLOCK_NONE',
-        }
 
         # Gera resposta com o histórico completo
         logging.debug("Chamando model.generate_content...")
-        resposta = model.generate_content(contents=historico, generation_config=generation_config, safety_settings=safety_settings)
+        resposta = model.generate_content(contents=historico)
         logging.debug(f"Resposta bruta da API: {resposta}")
         
         texto_resposta = "Não foi possível extrair uma resposta do modelo. A resposta pode estar vazia ou bloqueada." # Mensagem padrão
