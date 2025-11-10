@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>InteliBot</title>
 
-  <!-- Highlight.js para formatação de código -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>hljs.highlightAll();</script>
 
-  <!-- Fontes e estilos personalizados -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/x-icon">
   <link rel="stylesheet" href="/static/styles.css">
@@ -18,11 +16,10 @@
 <body>
 
   <div class="chat-wrapper">
-    <h1 class="chat-title">👋 Bem-vindos ao InteliBot! <span id="auto-type"></span></h1>
+    <h1 class="chat-title"><strong>👋 Bem-vindos ao InteliBot!</strong> <span id="auto-type"></span></h1>
 
     <div class="chat-history" id="historico">
-      <!-- Mensagens serão adicionadas aqui -->
-    </div>
+      </div>
 
     <div class="chat-input-area">
       <textarea id="pergunta" name="pergunta" placeholder="Digite sua pergunta ao InteliBot 🤖..."></textarea>
@@ -34,7 +31,6 @@
     </div>
   </div>
 
-  <!-- Script JS -->
   <script>
     const historicoDiv = document.getElementById('historico');
     const perguntaInput = document.getElementById('pergunta');
@@ -42,12 +38,34 @@
     const enviarButton = document.getElementById('enviar');
 
     function formatarResposta(texto) {
-      // Adiciona a formatação para negrito com ***texto***
-      texto = texto.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong>$1</strong>');
+      // 1. CORREÇÃO 2: Negrito com dois asteriscos (**)
+      texto = texto.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+      
+      // 2. Itálico com um asterisco (*)
+      texto = texto.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+      
+      // 3. Cabeçalhos (H3, H2, H1) - O Gemini frequentemente usa ###
+      texto = texto.replace(/###\s*(.*)/g, '<h3>$1</h3>');
+      texto = texto.replace(/##\s*(.*)/g, '<h2>$1</h2>');
+      texto = texto.replace(/#\s*(.*)/g, '<h1>$1</h1>');
+      
+      // 4. Listas (assumindo que o Gemini usa * para listas não ordenadas)
+      // Esta é uma implementação básica. Para listas complexas, o uso de uma biblioteca de parsing de Markdown seria melhor.
+      texto = texto.replace(/^\*\s*(.*)$/gm, '<li>$1</li>');
+      
+      // 5. Bloco de Código (```) - Já estava correto
       texto = texto.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-        return `<pre><code class="language-${lang || 'plaintext'}">${hljs.highlightAuto(code).value}</code></pre>`;
+        // Limpa possíveis tags HTML dentro do código para evitar injeção
+        const safeCode = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<pre><code class="language-${lang || 'plaintext'}">${hljs.highlightAuto(safeCode).value}</code></pre>`;
       });
+
+      // 6. Código Inline (`) - Já estava correto
       texto = texto.replace(/`([^`\n]+)`/g, (match, inline) => `<code>${inline}</code>`);
+
+      // 7. Quebras de Linha (transforma \n em <br> para melhor visualização)
+      texto = texto.replace(/\n/g, '<br>');
+
       return texto;
     }
 
@@ -56,9 +74,11 @@
       div.classList.add('mensagem');
       if (mensagem.remetente === 'user') {
         div.classList.add('mensagem-usuario');
-        div.textContent = `Você: ${mensagem.texto}`;
+        // Usamos textContent aqui para segurança e formatação simples
+        div.textContent = `Você: ${mensagem.texto}`; 
       } else {
         div.classList.add('mensagem-bot');
+        // Usamos innerHTML para renderizar as tags HTML geradas pela formatação Markdown
         div.innerHTML = `${formatarResposta(mensagem.texto)}`;
       }
       historicoDiv.appendChild(div);
@@ -87,7 +107,7 @@
           enviarButton.disabled = false;
           if (data.erro) {
             // Se o servidor retornou uma chave 'erro', exibe a mensagem de erro
-            adicionarMensagem({ remetente: 'gemini', texto: `Erro no servidor: ${data.erro}` });
+            adicionarMensagem({ remetente: 'gemini', texto: `Resposta: Erro no servidor: ${data.erro}` });
           } else {
             // Caso contrário, exibe a resposta normal
             adicionarMensagem({ remetente: 'gemini', texto: data.resposta || 'Sem resposta.' });
@@ -99,14 +119,12 @@
         });
     });
   </script>
-  <!-- Typing Js inline -->
   <script>
       const textos = [
     "Eu sou o seu assistente inteligente 🤖",
     "As soluções inteligentes para as suas dúvidas ⚛️.",
     "Onde Conecta você ao conhecimento 🧠."
   ];
-
 
   let i = 0;      
   let j = 0;      
