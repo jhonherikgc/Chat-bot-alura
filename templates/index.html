@@ -18,17 +18,17 @@
 <body>
 
   <div class="chat-wrapper">
-    <h1 class="chat-title">🤖Bem-vindo (a) ao InteliBot <span id="auto-type"></span>🤖</h1>
+    <h1 class="chat-title">👋 Bem-vindos ao InteliBot! <span id="auto-type"></span></h1>
 
     <div class="chat-history" id="historico">
       <!-- Mensagens serão adicionadas aqui -->
     </div>
 
     <div class="chat-input-area">
-      <textarea id="pergunta" name="pergunta" placeholder="Digite sua pergunta ao InteliBot..."></textarea>
+      <textarea id="pergunta" name="pergunta" placeholder="Digite sua pergunta ao InteliBot 🤖..."></textarea>
       <select id="modelo" name="modelo">
-        <option value="gemini-1.5-flash">Flash 1.5</option>
-        <option value="gemini-2.0-flash">Flash 2.0</option>
+        <option value="gemini-2.5-flash">Flash 2.5</option>
+        <option value="gemini-2.5-pro">Pro 2.5</option>
       </select>
       <button id="enviar">Enviar</button>
     </div>
@@ -42,6 +42,8 @@
     const enviarButton = document.getElementById('enviar');
 
     function formatarResposta(texto) {
+      // Adiciona a formatação para negrito com ***texto***
+      texto = texto.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong>$1</strong>');
       texto = texto.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
         return `<pre><code class="language-${lang || 'plaintext'}">${hljs.highlightAuto(code).value}</code></pre>`;
       });
@@ -57,7 +59,7 @@
         div.textContent = `Você: ${mensagem.texto}`;
       } else {
         div.classList.add('mensagem-bot');
-        div.innerHTML = `<strong>Resposta:</strong> ${formatarResposta(mensagem.texto)}`;
+        div.innerHTML = `${formatarResposta(mensagem.texto)}`;
       }
       historicoDiv.appendChild(div);
       historicoDiv.scrollTop = historicoDiv.scrollHeight;
@@ -83,21 +85,28 @@
         .then(response => response.json())
         .then(data => {
           enviarButton.disabled = false;
-          adicionarMensagem({ remetente: 'gemini', texto: data.resposta || 'Sem resposta.' });
+          if (data.erro) {
+            // Se o servidor retornou uma chave 'erro', exibe a mensagem de erro
+            adicionarMensagem({ remetente: 'gemini', texto: `Erro no servidor: ${data.erro}` });
+          } else {
+            // Caso contrário, exibe a resposta normal
+            adicionarMensagem({ remetente: 'gemini', texto: data.resposta || 'Sem resposta.' });
+          }
         })
         .catch(error => {
           enviarButton.disabled = false;
-          adicionarMensagem({ remetente: 'gemini', texto: `Erro: ${error}` });
+          adicionarMensagem({ remetente: 'gemini', texto: `Erro de comunicação: ${error}` });
         });
     });
   </script>
   <!-- Typing Js inline -->
   <script>
       const textos = [
-    "A inteligência artificial ao seu alcance.",
-    "As soluções inteligentes para as suas dúvidas.",
-    "Onde Conecta você ao conhecimento."
+    "Eu sou o seu assistente inteligente 🤖",
+    "As soluções inteligentes para as suas dúvidas ⚛️.",
+    "Onde Conecta você ao conhecimento 🧠."
   ];
+
 
   let i = 0;      
   let j = 0;      
