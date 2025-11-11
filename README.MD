@@ -2,7 +2,7 @@
 
 **InteliBot** é um assistente virtual inteligente construído com **Flask** e integrado aos modelos **Gemini (Google Generative AI)**. Ele permite ao usuário conversar com a IA, receber respostas com código formatado, e ainda simula uma animação de digitação para uma experiência mais fluida e realista.
 
-<img src="./static/img/Screenshot From 2025-11-10 16-31-03.png" alt="projeto_foto"></img>
+<img src="./static/img/Screenshot From 2025-11-10 16-31-03.png" alt="print_chat"></img>
 
 ---
 
